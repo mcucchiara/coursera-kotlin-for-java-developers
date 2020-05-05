@@ -1,5 +1,8 @@
 package board
 
+import board.Direction.*
+
+
 fun createSquareBoard(width: Int): SquareBoard = SquareBoardImpl(width)
 
 open class SquareBoardImpl(final override val width: Int) : SquareBoard {
@@ -13,8 +16,8 @@ open class SquareBoardImpl(final override val width: Int) : SquareBoard {
 	override fun getCellOrNull(i: Int, j: Int): Cell? = cells.getOrNull(i - 1)?.getOrNull(j - 1)
 
 	override fun getCell(i: Int, j: Int): Cell {
-		require(i in 1..width) { "i must be a number between 1 and $width " }
-		require(j in 1..width) { "j must be a number between 1 and $width " }
+		require(i in 1..width) { "i must be a number between 1 and $width (current value: ${i})" }
+		require(j in 1..width) { "j must be a number between 1 and $width (current value: ${j})" }
 		return getCellOrNull(i, j)!!
 	}
 
@@ -26,10 +29,10 @@ open class SquareBoardImpl(final override val width: Int) : SquareBoard {
 
 	override fun Cell.getNeighbour(direction: Direction): Cell? {
 		val (i1, j1) = when (direction) {
-			Direction.UP -> i - 1 to j
-			Direction.DOWN -> i + 1 to j
-			Direction.LEFT -> i to j - 1
-			Direction.RIGHT -> i to j + 1
+			UP -> i - 1 to j
+			DOWN -> i + 1 to j
+			LEFT -> i to j - 1
+			RIGHT -> i to j + 1
 		}
 		return getCellOrNull(i1, j1)
 	}
@@ -40,6 +43,9 @@ fun <T> createGameBoard(width: Int): GameBoard<T> = GameBoardImpl(width)
 class GameBoardImpl<T>(override val width: Int) : GameBoard<T>, SquareBoard by SquareBoardImpl(width) {
 	private val idx = hashMapOf<Cell, T?>()
 
+	init {
+		getAllCells().map { idx[it] = null }
+	}
 	override fun get(cell: Cell): T? = idx[cell]
 
 	override fun set(cell: Cell, value: T?) {
